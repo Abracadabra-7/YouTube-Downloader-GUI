@@ -17,7 +17,7 @@ A graphical user interface (GUI) for downloading YouTube videos and playlists us
 
 - Download individual YouTube videos by entering video URL
 - Download entire YouTube playlists by entering playlist URL
-- Select video quality (low, medium, high, very high) when downloading
+- Select video quality (low, medium, high) when downloading
 - Choose download directory using file browser
 
 ## Known Issues
