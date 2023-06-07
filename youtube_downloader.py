@@ -1,6 +1,7 @@
 import tkinter as tk
 from tkinter import filedialog
 from pytube import YouTube, Playlist
+import os
 
 def download_video():
     url = url_entry.get()
@@ -19,7 +20,69 @@ def download_video():
                 # Get the selected video quality
                 selected_quality = quality_choices.get()
 
-                # Get the video stream with the selected quality
+                if selected_quality == "Audio Only":
+                    # Get the audio stream
+                    audio_stream = yt.streams.filter(only_audio=True).order_by('abr').desc().first()
+
+                    # Get the download directory from the user input
+                    download_directory = directory_entry.get()
+
+                    # Download the audio to the selected directory as an MP3 file
+                    audio_stream.download(download_directory)
+                    file_name = audio_stream.default_filename
+                    base, ext = file_name.split('.')
+                    new_file_name = f"{base}.mp3"
+                    os.rename(os.path.join(download_directory, file_name), os.path.join(download_directory, new_file_name))
+
+                    # Display a success message
+                    status_label.config(text=f"Downloaded {yt.title} audio successfully!")
+                else:
+                    # Get the video stream with the selected quality
+                    video_stream = None
+                    if selected_quality == "Low":
+                        video_stream = yt.streams.filter(progressive=True, file_extension='mp4').order_by('resolution').asc().first()
+                    elif selected_quality == "Medium":
+                        video_stream = yt.streams.filter(progressive=True, file_extension='mp4', res='360p').order_by('resolution').asc().first()
+                    elif selected_quality == "High":
+                        video_stream = yt.streams.filter(progressive=True, file_extension='mp4', res='720p').order_by('resolution').asc().first()
+
+                    # Get the download directory from the user input
+                    download_directory = directory_entry.get()
+
+                    # Download the video to the selected directory
+                    video_stream.download(download_directory)
+
+                    # Display a success message
+                    status_label.config(text=f"Downloaded {yt.title} video successfully!")
+        except Exception as e:
+            # Display an error message
+            status_label.config(text=f"Error downloading playlist: {str(e)}")
+    else:
+        try:
+            # Create a YouTube object
+            yt = YouTube(url)
+
+            # Get the selected video quality
+            selected_quality = quality_choices.get()
+
+            if selected_quality == "Audio Only":
+                # Get the audio stream
+                audio_stream = yt.streams.filter(only_audio=True).order_by('abr').desc().first()
+
+                # Get the download directory from the user input
+                download_directory = directory_entry.get()
+
+                # Download the audio to the selected directory as an MP3 file
+                audio_stream.download(download_directory)
+                file_name = audio_stream.default_filename
+                base, ext = file_name.split('.')
+                new_file_name = f"{base}.mp3"
+                os.rename(os.path.join(download_directory, file_name), os.path.join(download_directory, new_file_name))
+
+                # Display a success message
+                status_label.config(text="Downloaded audio successfully!")
+            else:
+                # Get the video stream with the selectedquality
                 video_stream = None
                 if selected_quality == "Low":
                     video_stream = yt.streams.filter(progressive=True, file_extension='mp4').order_by('resolution').asc().first()
@@ -35,35 +98,7 @@ def download_video():
                 video_stream.download(download_directory)
 
                 # Display a success message
-                status_label.config(text=f"Downloaded {yt.title} successfully!")
-        except Exception as e:
-            # Display an error message
-            status_label.config(text=f"Error downloading playlist: {str(e)}")
-    else:
-        try:
-            # Create a YouTube object
-            yt = YouTube(url)
-
-            # Get the selected video quality
-            selected_quality = quality_choices.get()
-
-            # Get the video stream with the selectedquality
-            video_stream = None
-            if selected_quality == "Low":
-                video_stream = yt.streams.filter(progressive=True, file_extension='mp4').order_by('resolution').asc().first()
-            elif selected_quality == "Medium":
-                video_stream = yt.streams.filter(progressive=True, file_extension='mp4', res='360p').order_by('resolution').asc().first()
-            elif selected_quality == "High":
-                video_stream = yt.streams.filter(progressive=True, file_extension='mp4', res='720p').order_by('resolution').asc().first()
-
-            # Get the download directory from the user input
-            download_directory = directory_entry.get()
-
-            # Download the video to the selected directory
-            video_stream.download(download_directory)
-
-            # Display a success message
-            status_label.config(text="Video downloaded successfully!")
+                status_label.config(text="Video downloaded successfully!")
         except Exception as e:
             # Display an error message
             status_label.config(text=f"Error: {str(e)}")
@@ -84,12 +119,12 @@ url_label.pack()
 url_entry = tk.Entry(width=50)
 url_entry.pack()
 
-# Create the quality label and dropdown box
+# Create the quality labeland dropdown box
 quality_label = tk.Label(text="Select the video quality:")
 quality_label.pack()
 quality_choices = tk.StringVar(window)
 quality_choices.set("High") # default value
-quality_dropdown = tk.OptionMenu(window, quality_choices, "Low", "Medium", "High")
+quality_dropdown = tk.OptionMenu(window, quality_choices, "Low", "Medium", "High", "Audio Only")
 quality_dropdown.pack()
 
 # Create the directory label, entry box, and button
@@ -100,13 +135,11 @@ directory_entry.pack()
 directory_button = tk.Button(text="Choose", command=choose_directory)
 directory_button.pack()
 
-# Create the download button
+# Create the download button and status label
 download_button = tk.Button(text="Download", command=download_video)
 download_button.pack()
-
-# Create the status label
 status_label = tk.Label(text="")
 status_label.pack()
 
-# Start the main event loop
+# Run the window loop
 window.mainloop()
