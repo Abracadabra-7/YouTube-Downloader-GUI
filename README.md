@@ -9,7 +9,7 @@ A graphical user interface (GUI) for downloading YouTube videos and playlists us
 
 ## Installation and Usage
 
-1. Clone the repository: `git clone https://github.com/your-username/youtube-downloader.git`
+1. Clone the repository: `git clone (https://github.com/Abracadabra-7/YouTube-Downloader-GUI.git)`
 2. Install dependencies: `pip install pytube`
 3. Run the program: `python youtube_downloader.py`
 
